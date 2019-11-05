@@ -7,7 +7,7 @@
 # NETWORK ENVIRONMENT
 #
 
-# Select a Bitcoin network
+# Select a Slice network
 # Do not modify this value after the first install
 # Value: mainnet | testnet
-COMMON_BTC_NETWORK=mainnet
+COMMON_SLC_NETWORK=mainnet

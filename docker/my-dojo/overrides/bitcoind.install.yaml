@@ -1,9 +1,9 @@
 version: "3.2"
 
 services:
-  bitcoind:
-    image: "samouraiwallet/dojo-bitcoind:${DOJO_BITCOIND_VERSION_TAG}"
-    container_name: bitcoind
+  sliced:
+    image: "samouraiwallet/dojo-bitcoind:${DOJO_SLICED_VERSION_TAG}"
+    container_name: sliced
     build:
       context: ./bitcoin
     env_file:
@@ -13,12 +13,12 @@ services:
     restart: on-failure
     command: "/wait-for-it.sh tor:9050 --timeout=360 --strict -- /restart.sh"
     expose:
-      - "8333"
+      - "40010"
       - "28256"
       - "9501"
       - "9502"
     volumes:
-      - data-bitcoind:/home/bitcoin/.bitcoin
+      - data-bitcoind:/home/slice/.slice
       - data-tor:/var/lib/tor
     depends_on:
       - db
@@ -29,7 +29,7 @@ services:
 
   node:
     depends_on:
-      - bitcoind
+      - sliced
 
 volumes:
   data-bitcoind:

@@ -2,29 +2,22 @@ FROM    debian:stretch
 
 
 #################################################################
-# INSTALL BITCOIN
+# INSTALL SLICE
 #################################################################
-ENV     BITCOIN_HOME        /home/bitcoin
-ENV     BITCOIN_VERSION     0.18.1
-ENV     BITCOIN_URL         https://bitcoincore.org/bin/bitcoin-core-0.18.1/bitcoin-0.18.1-x86_64-linux-gnu.tar.gz
-ENV     BITCOIN_SHA256      600d1db5e751fa85903e935a01a74f5cc57e1e7473c15fd3e17ed21e202cfe5a
-ENV     BITCOIN_ASC_URL     https://bitcoincore.org/bin/bitcoin-core-0.18.1/SHA256SUMS.asc
-ENV     BITCOIN_PGP_KEY     01EA5486DE18A882D4C2684590C8019E36C2E964
+ENV     SLICE_HOME        /home/slice
+ENV     SLICE_VERSION     0.18.1
+ENV     SLICE_URL         https://github.com/slicecoincore/slice/releases/download/v0.18.1/slice-0.18.1-x86_64-linux-gnu.tar.gz
 
 RUN     set -ex && \
         apt-get update && \
         apt-get install -qq --no-install-recommends ca-certificates dirmngr gosu gpg wget && \
         rm -rf /var/lib/apt/lists/*
 
-# Build and install bitcoin binaries
+# Build and install slice binaries
 RUN     set -ex && \
         cd /tmp && \
-        wget -qO bitcoin.tar.gz "$BITCOIN_URL" && \
-        echo "$BITCOIN_SHA256 bitcoin.tar.gz" | sha256sum -c - && \
-        gpg --batch --keyserver keyserver.ubuntu.com --recv-keys "$BITCOIN_PGP_KEY" && \
-        wget -qO bitcoin.asc "$BITCOIN_ASC_URL" && \
-        gpg --batch --verify bitcoin.asc && \
-        tar -xzvf bitcoin.tar.gz -C /usr/local --strip-components=1 --exclude=*-qt && \
+        wget -q "$SLICE_URL" && \
+        tar -xzvf slice-0.18.1-x86_64-linux-gnu.tar.gz -C /usr/local --strip-components=1 && \
         rm -rf /tmp/*
 
 # Create groups bitcoin & tor
@@ -35,8 +28,8 @@ RUN     addgroup --system -gid 1108 bitcoin && \
         usermod -a -G tor bitcoin
 
 # Create data directory
-RUN     mkdir "$BITCOIN_HOME/.bitcoin" && \
-        chown -h bitcoin:bitcoin "$BITCOIN_HOME/.bitcoin"
+RUN     mkdir "$SLICE_HOME/.slice" && \
+        chown -h bitcoin:bitcoin "$SLICE_HOME/.slice"
 
 # Copy restart script
 COPY    ./restart.sh /restart.sh
@@ -50,6 +43,6 @@ RUN     chown bitcoin:bitcoin /wait-for-it.sh && \
         chmod u+x /wait-for-it.sh && \
         chmod g+x /wait-for-it.sh
 
-EXPOSE  8333 9501 9502 28256
+EXPOSE  9501 9502 28256 40010
 
 USER    bitcoin

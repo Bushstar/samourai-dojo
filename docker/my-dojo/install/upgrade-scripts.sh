@@ -11,7 +11,7 @@ source ./conf/docker-bitcoind.conf
 # Confirm upgrade operation
 get_confirmation() {
   while true; do
-    echo "This operation is going to upgrade your Dojo to v$DOJO_VERSION_TAG for $COMMON_BTC_NETWORK."
+    echo "This operation is going to upgrade your Dojo to v$DOJO_VERSION_TAG for $COMMON_SLC_NETWORK."
     read -p "Do you wish to continue? [y/n]" yn
     case $yn in
       [Yy]* ) return 0;;
@@ -50,7 +50,7 @@ update_config_files() {
   echo "Initialized docker-node.conf"
 
   # Initialize config files for nginx and the maintenance tool 
-  if [ "$COMMON_BTC_NETWORK" == "testnet" ]; then
+  if [ "$COMMON_SLC_NETWORK" == "testnet" ]; then
     cp ./nginx/testnet.conf ./nginx/dojo.conf
     echo "Initialized dojo.conf (nginx)"
     cp ../../static/admin/conf/index-testnet.js ../../static/admin/conf/index.js
@@ -82,16 +82,4 @@ update_config_file() {
 # Update dojo database
 update_dojo_db() {
   docker exec -d db /update-db.sh
-}
-
-# Clean-up
-cleanup() {
-  #################
-  # Clean-up v1.1.0
-  #################
-
-  # Remove deprecated bitcoin.conf file
-  if [ -f ./bitcoin/bitcoin.conf ]; then
-    rm ./bitcoin/bitcoin.conf
-  fi
 }

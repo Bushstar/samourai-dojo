@@ -3,9 +3,9 @@
  * Copyright (c) 2016-2018, Samourai Wallet (CC BY-NC-ND 4.0 License).
  */
 
-const bitcoinNetwork = (process.env.COMMON_BTC_NETWORK == 'testnet')
+const sliceNetwork = (process.env.COMMON_SLC_NETWORK == 'testnet')
   ? 'testnet'
-  : 'bitcoin'
+  : 'slice'
 
 /**
  * Desired structure of /keys/index.js, which is ignored in the repository.
@@ -14,30 +14,30 @@ module.exports = {
   /*
    * Mainnet parameters
    */
-  [bitcoinNetwork]: {
+  [sliceNetwork]: {
     /*
      * Dojo version
      */
     dojoVersion: process.env.DOJO_VERSION_TAG,
     /*
-     * Bitcoind
+     * Sliced
      */
-    bitcoind: {
+    sliced: {
       // RPC API
       rpc: {
         // Login
-        user: process.env.BITCOIND_RPC_USER,
+        user: process.env.SLICED_RPC_USER,
         // Password
-        pass: process.env.BITCOIND_RPC_PASSWORD,
+        pass: process.env.SLICED_RPC_PASSWORD,
         // IP address
-        host: process.env.BITCOIND_IP,
+        host: process.env.SLICED_IP,
         // TCP port
-        port: parseInt(process.env.BITCOIND_RPC_PORT)
+        port: parseInt(process.env.SLICED_RPC_PORT)
       },
       // ZMQ Tx notifications
-      zmqTx: `tcp://${process.env.BITCOIND_IP}:${process.env.BITCOIND_ZMQ_RAWTXS}`,
+      zmqTx: `tcp://${process.env.SLICED_IP}:${process.env.SLICED_ZMQ_RAWTXS}`,
       // ZMQ Block notifications
-      zmqBlk: `tcp://${process.env.BITCOIND_IP}:${process.env.BITCOIND_ZMQ_BLK_HASH}`,
+      zmqBlk: `tcp://${process.env.SLICED_IP}:${process.env.SLICED_ZMQ_BLK_HASH}`,
       // Fee type (estimatesmartfee)
       feeType: process.env.NODE_FEE_TYPE
     },
@@ -192,10 +192,10 @@ module.exports = {
      * used for fast scan of addresses
      */
     explorers: {
-      // Use local bitcoind for imports and rescans
+      // Use local sliced for imports and rescans
       // or use OXT as a fallback
       // Values: active | inactive
-      bitcoind: process.env.NODE_IMPORT_FROM_BITCOIND,
+      sliced: process.env.NODE_IMPORT_FROM_SLICED,
       // Use a SOCKS5 proxy for all communications with external services
       // Values: null if no socks5 proxy used, otherwise the url of the socks5 proxy
       socks5Proxy: 'socks5h://172.28.1.4:9050',

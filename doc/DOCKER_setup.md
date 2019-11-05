@@ -94,9 +94,9 @@ This procedure allows to install a new Dojo from scratch.
   * Go to the `<dojo_dir>/docker/my-dojo/conf` directory
 
   * Edit docker-bitcoind.conf.tpl and provide a new value for the following parameters:
-      * `BITCOIND_RPC_USER` = login protecting the access to the RPC API of your full node,
-      * `BITCOIND_RPC_PASSWORD` = password protecting the access to the RPC API of your full node.
-      * If your machine has a lot of RAM, it's recommended that you increase the value of `BITCOIND_DB_CACHE` for a faster Initial Block Download.
+      * `SLICED_RPC_USER` = login protecting the access to the RPC API of your full node,
+      * `SLICED_RPC_PASSWORD` = password protecting the access to the RPC API of your full node.
+      * If your machine has a lot of RAM, it's recommended that you increase the value of `SLICED_DB_CACHE` for a faster Initial Block Download.
       * This file also provides a few additional settings for advanced setups: 
         * static onion address for your full node,
         * bitcoind RPC API exposed to external apps,
@@ -209,7 +209,7 @@ Available commands:
 
   help                          Display the help message.
 
-  bitcoin-cli                   Launch a bitcoin-cli console for interacting with bitcoind RPC API.
+  slice-cli                     Launch a slice-cli console for interacting with sliced RPC API.
 
   clean                         Free disk space by deleting docker dangling images and images of previous versions.
 
@@ -219,7 +219,7 @@ Available commands:
 
                                 Available modules:
                                   dojo.sh logs                : display the logs of all containers
-                                  dojo.sh logs bitcoind       : display the logs of bitcoind
+                                  dojo.sh logs sliced         : display the logs of sliced
                                   dojo.sh logs db             : display the logs of the MySQL database
                                   dojo.sh logs tor            : display the logs of tor
                                   dojo.sh logs api            : display the logs of the REST API (nodejs)

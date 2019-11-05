@@ -19,16 +19,16 @@ source_file "$DIR/conf/docker-common.conf"
 source_file "$DIR/.env"
 
 # Export some variables for compose
-export BITCOIND_RPC_EXTERNAL_IP
+export SLICED_RPC_EXTERNAL_IP
 
 # Select YAML files
 select_yaml_files() {
   yamlFiles="-f $DIR/docker-compose.yaml"
 
-  if [ "$BITCOIND_INSTALL" == "on" ]; then
+  if [ "$SLICED_INSTALL" == "on" ]; then
     yamlFiles="$yamlFiles -f $DIR/overrides/bitcoind.install.yaml"
 
-    if [ "$BITCOIND_RPC_EXTERNAL" == "on" ]; then
+    if [ "$SLICED_RPC_EXTERNAL" == "on" ]; then
       yamlFiles="$yamlFiles -f $DIR/overrides/bitcoind.rpc.expose.yaml"
     fi
   fi
@@ -50,25 +50,25 @@ start() {
 
 # Stop
 stop() {
-  if [ "$BITCOIND_INSTALL" == "on" ]; then
-    if [ "$BITCOIND_EPHEMERAL_HS" = "on" ]; then
+  if [ "$SLICED_INSTALL" == "on" ]; then
+    if [ "$SLICED_EPHEMERAL_HS" = "on" ]; then
       docker exec -it tor rm -rf /var/lib/tor/hsv2bitcoind
     fi
 
-    docker exec -it bitcoind  bitcoin-cli \
-      -rpcconnect=bitcoind \
+    docker exec -it sliced  slice-cli \
+      -rpcconnect=sliced \
       --rpcport=28256 \
-      --rpcuser="$BITCOIND_RPC_USER" \
-      --rpcpassword="$BITCOIND_RPC_PASSWORD" \
+      --rpcuser="$SLICED_RPC_USER" \
+      --rpcpassword="$SLICED_RPC_PASSWORD" \
       stop
 
     echo "Preparing shutdown of dojo. Please wait."
 
-    bitcoindDown=$(timeout 3m docker wait bitcoind)
-    if [ $bitcoindDown -eq 0 ]; then
-      echo "Bitcoin server stopped."
+    slicedDown=$(timeout 3m docker wait sliced)
+    if [ $slicedDown -eq 0 ]; then
+      echo "Slice server stopped."
     else
-      echo "Force shutdown of Bitcoin server."
+      echo "Force shutdown of Slice server."
     fi
   fi
 
@@ -110,7 +110,7 @@ uninstall() {
   eval "docker-compose $yamlFiles down"
 
   docker image rm samouraiwallet/dojo-db:"$DOJO_DB_VERSION_TAG"
-  docker image rm samouraiwallet/dojo-bitcoind:"$DOJO_BITCOIND_VERSION_TAG"
+  docker image rm samouraiwallet/dojo-bitcoind:"$DOJO_SLICED_VERSION_TAG"
   docker image rm samouraiwallet/dojo-nodejs:"$DOJO_NODEJS_VERSION_TAG"
   docker image rm samouraiwallet/dojo-nginx:"$DOJO_NGINX_VERSION_TAG"
   docker image rm samouraiwallet/dojo-tor:"$DOJO_TOR_VERSION_TAG"
@@ -132,7 +132,7 @@ del_images_for() {
 clean() {
   docker image prune
   del_images_for samouraiwallet/dojo-db "$DOJO_DB_VERSION_TAG"
-  del_images_for samouraiwallet/dojo-bitcoind "$DOJO_BITCOIND_VERSION_TAG"
+  del_images_for samouraiwallet/dojo-bitcoind "$DOJO_SLICED_VERSION_TAG"
   del_images_for samouraiwallet/dojo-nodejs "$DOJO_NODEJS_VERSION_TAG"
   del_images_for samouraiwallet/dojo-nginx "$DOJO_NGINX_VERSION_TAG"
   del_images_for samouraiwallet/dojo-tor "$DOJO_TOR_VERSION_TAG"
@@ -154,9 +154,8 @@ upgrade() {
   if [ $launchUpgrade -eq 0 ]; then
     yamlFiles=$(select_yaml_files)
     update_config_files
-    cleanup
     source_file "$DIR/conf/docker-bitcoind.conf"
-    export BITCOIND_RPC_EXTERNAL_IP
+    export SLICED_RPC_EXTERNAL_IP
     eval "docker-compose $yamlFiles build --no-cache"
     docker_up --remove-orphans
     update_dojo_db
@@ -172,9 +171,9 @@ onion() {
   echo "API hidden service address (v3) = $V3_ADDR"
   echo "API hidden service address (v2) = $V2_ADDR"
 
-  if [ "$BITCOIND_INSTALL" == "on" ]; then
+  if [ "$SLICED_INSTALL" == "on" ]; then
     V2_ADDR_BTCD=$( docker exec -it tor cat /var/lib/tor/hsv2bitcoind/hostname )
-    echo "bitcoind hidden service address (v2) = $V2_ADDR_BTCD"
+    echo "sliced hidden service address (v2) = $V2_ADDR_BTCD"
   fi
 }
 
@@ -200,16 +199,16 @@ logs() {
     db )
       docker-compose logs --tail=50 --follow db
       ;;
-    bitcoind )
-      if [ "$BITCOIND_INSTALL" == "on" ]; then
-        if [ "$COMMON_BTC_NETWORK" == "testnet" ]; then
-          bitcoindDataDir="/home/bitcoin/.bitcoin/testnet3"
+    sliced )
+      if [ "$SLICED_INSTALL" == "on" ]; then
+        if [ "$COMMON_SLC_NETWORK" == "testnet" ]; then
+          slicedDataDir="/home/slice/.slice/testnet3"
         else
-          bitcoindDataDir="/home/bitcoin/.bitcoin"
+          slicedDataDir="/home/slice/.slice"
         fi
-        docker exec -ti bitcoind tail -f "$bitcoindDataDir/debug.log"
+        docker exec -ti sliced tail -f "$slicedDataDir/debug.log"
       else
-        echo -e "Command not supported for your setup.\nCause: Your Dojo is using an external bitcoind"
+        echo -e "Command not supported for your setup.\nCause: Your Dojo is using an external sliced"
       fi
       ;;
     tor )
@@ -221,8 +220,8 @@ logs() {
     * )
       yamlFiles=$(select_yaml_files)
       services="nginx node tor db" 
-      if [ "$BITCOIND_INSTALL" == "on" ]; then
-        services="$services bitcoind"
+      if [ "$SLICED_INSTALL" == "on" ]; then
+        services="$services sliced"
       fi
       eval "docker-compose $yamlFiles logs --tail=0 --follow $services"
       ;;
@@ -238,7 +237,7 @@ help() {
   echo " "
   echo "  help                          Display this help message."
   echo " "
-  echo "  bitcoin-cli                   Launch a bitcoin-cli console allowing to interact with your full node through its RPC API."
+  echo "  slice-cli                     Launch a slice-cli console allowing to interact with your full node through its RPC API."
   echo " "
   echo "  clean                         Free disk space by deleting docker dangling images and images of previous versions."
   echo " "
@@ -248,7 +247,7 @@ help() {
   echo " "
   echo "                                Available modules:"
   echo "                                  dojo.sh logs                : display the logs of all the Docker containers"
-  echo "                                  dojo.sh logs bitcoind       : display the logs of bitcoind"
+  echo "                                  dojo.sh logs sliced         : display the logs of sliced"
   echo "                                  dojo.sh logs db             : display the logs of the MySQL database"
   echo "                                  dojo.sh logs tor            : display the logs of tor"
   echo "                                  dojo.sh logs api            : display the logs of the REST API (nodejs)"
@@ -299,16 +298,16 @@ shift $((OPTIND -1))
 subcommand=$1; shift
 
 case "$subcommand" in
-  bitcoin-cli )
-    if [ "$BITCOIND_INSTALL" == "on" ]; then
-      docker exec -it bitcoind bitcoin-cli \
-        -rpcconnect=bitcoind \
+  slice-cli )
+    if [ "$SLICED_INSTALL" == "on" ]; then
+      docker exec -it sliced slice-cli \
+        -rpcconnect=sliced \
         --rpcport=28256 \
-        --rpcuser="$BITCOIND_RPC_USER" \
-        --rpcpassword="$BITCOIND_RPC_PASSWORD" \
+        --rpcuser="$SLICED_RPC_USER" \
+        --rpcpassword="$SLICED_RPC_PASSWORD" \
         $1 $2 $3 $4 $5
       else
-        echo -e "Command not supported for your setup.\nCause: Your Dojo is using an external bitcoind"
+        echo -e "Command not supported for your setup.\nCause: Your Dojo is using an external sliced"
       fi
     ;;
   help )

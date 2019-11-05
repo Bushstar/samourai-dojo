@@ -20,11 +20,11 @@ NODE_ADMIN_KEY=myAdminKey
 # Type: alphanumeric
 NODE_JWT_SECRET=myJwtSecret
 
-# Data source used for imports and rescans (bitcoind or OXT)
-# Note: support of local bitcoind is an experimental feature
+# Data source used for imports and rescans (sliced or OXT)
+# Note: support of local sliced is an experimental feature
 # Values: active | inactive
-NODE_IMPORT_FROM_BITCOIND=active
+NODE_IMPORT_FROM_SLICED=active
 
-# FEE TYPE USED FOR FEES ESTIMATIONS BY BITCOIND
+# FEE TYPE USED FOR FEES ESTIMATIONS BY SLICED
 # Allowed values are ECONOMICAL or CONSERVATIVE
 NODE_FEE_TYPE=ECONOMICAL

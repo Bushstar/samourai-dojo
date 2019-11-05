@@ -61,12 +61,12 @@ zmqpubrawtx=...
 nano ./conf/docker-bitcoind.conf.tpl
 
 #
-# Set the value of BITCOIND_INSTALL to "off"
-# Set the value of BITCOIND_IP with the IP address of you bitcoin full node
-# Set the value of BITCOIND_RPC_PORT with the port used by your bitcoin full node for the RPC API
-# Set the value of BITCOIND_ZMQ_RAWTXS with the port used by your bitcoin full node for ZMQ notifications of raw transactions
+# Set the value of SLICED_INSTALL to "off"
+# Set the value of SLICED_IP with the IP address of you bitcoin full node
+# Set the value of SLICED_RPC_PORT with the port used by your bitcoin full node for the RPC API
+# Set the value of SLICED_ZMQ_RAWTXS with the port used by your bitcoin full node for ZMQ notifications of raw transactions
 #   (i.e. port defined for -zmqpubrawtx in the bitcoin.conf of your full node)
-# Set the value of BITCOIND_ZMQ_BLK_HASH with the port used by your bitcoin full node for ZMQ notifications of block hashes
+# Set the value of SLICED_ZMQ_BLK_HASH with the port used by your bitcoin full node for ZMQ notifications of block hashes
 #   (i.e. port defined for -zmqpubhashblock in the bitcoin.conf of your full node)
 #
 # Save and exit nano
@@ -113,10 +113,10 @@ The following steps allow to expose the RPC API and ZMQ notifications to applica
 nano ./conf/docker-bitcoind.conf
 
 #
-# Set the value of BITCOIND_RPC_EXTERNAL to "on"
+# Set the value of SLICED_RPC_EXTERNAL to "on"
 #
 # If your Docker runs on macos or windows,
-# set the value of BITCOIND_RPC_EXTERNAL_IP to the IP address of the VM
+# set the value of SLICED_RPC_EXTERNAL_IP to the IP address of the VM
 #
 # Save and exit nano
 #
@@ -132,7 +132,7 @@ With this setting, external applications running on your local machine should be
 * 9503: bitcoind zmqpubrawblock notifications
 * 28256: bitcoind RPC API
 
-Note: this option has no effect if your setup relies on a external full node (i.e. if BITCOIND_INSTALL is set to "off").
+Note: this option has no effect if your setup relies on a external full node (i.e. if SLICED_INSTALL is set to "off").
 
 
 <a name="static_onion"/>
@@ -151,14 +151,14 @@ The following steps allow to keep a static onion address (not recommended).
 nano ./conf/docker-bitcoind.conf
 
 #
-# Set the value of BITCOIND_EPHEMERAL_HS to "off"
+# Set the value of SLICED_EPHEMERAL_HS to "off"
 #
 
 # Start your Dojo
 ./dojo.sh start
 ```
 
-Note: this option has no effect if your setup relies on a external full node (i.e. if BITCOIND_INSTALL is set to "off").
+Note: this option has no effect if your setup relies on a external full node (i.e. if SLICED_INSTALL is set to "off").
 
 
 <a name="testnet"/>
